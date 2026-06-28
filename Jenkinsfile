@@ -49,6 +49,31 @@ pipeline {
 
             }
         }
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck(
+                    odcInstallation: 'dc',
+                    additionalArguments: '--scan .'
+                )
+            }
+        }
+
+        stage('Publish OWASP Report') {
+            steps {
+                dependencyCheckPublisher(
+                    pattern: '**/dependency-check-report.xml'
+                )
+
+                publishHTML(target: [
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: '.',
+                    reportFiles: 'dependency-check-report.html',
+                    reportName: 'OWASP Dependency Check Report'
+                ])
+            }
+        }
         // stage('OWASP Dependency Check') {
         //     steps {
 
@@ -85,35 +110,35 @@ pipeline {
         //         ])
         //     }
         // }
-        stage('OWASP Dependency Check') {
-            steps {
+        // stage('OWASP Dependency Check') {
+        //     steps {
 
-                dependencyCheck(
-                    odcInstallation: 'dc',
-                    additionalArguments: '--scan .'
-                )
+        //         dependencyCheck(
+        //             odcInstallation: 'dc',
+        //             additionalArguments: '--scan .'
+        //         )
 
-            }
-        }
+        //     }
+        // }
 
-        stage('Publish OWASP Report') {
-            steps {
+        // stage('Publish OWASP Report') {
+        //     steps {
 
-                dependencyCheckPublisher(
-                    pattern: '**/dependency-check-report.xml'
-                )
+        //         dependencyCheckPublisher(
+        //             pattern: '**/dependency-check-report.xml'
+        //         )
 
-                publishHTML(target: [
-                        allowMissing: true,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: '.',
-                        reportFiles: 'dependency-check-report.html',
-                        reportName: 'OWASP Dependency Check Report'
-                ])
+        //         publishHTML(target: [
+        //                 allowMissing: true,
+        //                 alwaysLinkToLastBuild: true,
+        //                 keepAll: true,
+        //                 reportDir: '.',
+        //                 reportFiles: 'dependency-check-report.html',
+        //                 reportName: 'OWASP Dependency Check Report'
+        //         ])
 
-            }
-        }
+        //     }
+        // }
 
         stage('Trivy Filesystem Scan') {
             steps {
